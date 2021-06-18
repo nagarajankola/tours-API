@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const tourController = require('../controllers/tourController')
+const tourController = require('../controllers/tourController');
 
 // ROUTES
 // app.get('/api/v1/tours', getAllTours);
@@ -9,8 +9,17 @@ const tourController = require('../controllers/tourController')
 // app.patch('/api/v1/tours/:id', updateTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
 
-router.route('/').get(tourController.getAllTours).post(tourController.createTour);
+router.param('id', tourController.checkID);
 
-router.route('/:id').get(tourController.getTour).patch(tourController.updateTour).delete(tourController.deleteTour);
+router
+  .route('/')
+  .get(tourController.getAllTours)
+  .post(tourController.createTour);
+
+router
+  .route('/:id')
+  .get(tourController.getTour)
+  .patch(tourController.updateTour)
+  .delete(tourController.deleteTour);
 
 module.exports = router;

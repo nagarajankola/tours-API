@@ -5,6 +5,16 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+exports.checkID = (req, res, next,value) => {
+  if (req.params.id * 1 > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid tour id',
+    });
+  }
+  next();
+}
+
 // route to get all tours
 exports.getAllTours = (req, res) => {
   res.status(200).json({
@@ -42,14 +52,9 @@ exports.createTour = (req, res) => {
 
 // route to get single tour based on ID(params)
 exports.getTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
-  if (!tour) {
-    res.status(404).json({
-      status: 'fail',
-      message: 'Invalid tour id',
-    });
-  }
+  console.log(req.params);
+  const id = req.params.id;
+  const tour = tours.find(el=>el.id === id);
   res.status(200).json({
     status: 'success',
     data: {
@@ -60,14 +65,6 @@ exports.getTour = (req, res) => {
 
 // to update the tour data (yet to update the code )
 exports.updateTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
-  if (!tour) {
-    res.status(404).json({
-      status: 'fail',
-      message: 'Invalid tour id',
-    });
-  }
   res.status(200).json({
     status: 'success',
     data: {
@@ -78,14 +75,6 @@ exports.updateTour = (req, res) => {
 
 // route to  deleting a tour
 exports.deleteTour = (req, res) => {
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
-  if (!tour) {
-    res.status(404).json({
-      status: 'fail',
-      message: 'Invalid tour id',
-    });
-  }
   res.status(200).json({
     status: 'success',
     data: {
