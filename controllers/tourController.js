@@ -9,7 +9,6 @@ const Tour = require("./../models/tourModel");
 exports.getAllTours = async (req, res) => {
   try {
     const tours = await Tour.find();
-
     res.status(200).json({
       status: "success",
       result: tours.length,
@@ -19,7 +18,9 @@ exports.getAllTours = async (req, res) => {
     });
   } catch (error) {
     res.status(404).json({
-      message: "Nope",
+      status: "fail",
+
+      message: error,
     });
   }
 };
@@ -27,11 +28,8 @@ exports.getAllTours = async (req, res) => {
 // route to add new tour
 exports.createTour = async (req, res) => {
   try {
-    console.log(req.body);
-    const newTour = new Tour({
-      name: req.body.name,
-      price: req.body.price,
-    });
+    // console.log(req.body);
+    const newTour = new Tour(req.body);
     const response = await newTour.save();
     res.status(201).json({
       status: "success",
@@ -43,6 +41,7 @@ exports.createTour = async (req, res) => {
     console.log(error);
     res.status(400).json({
       status: "fail",
+
       message: error,
     });
   }
@@ -61,7 +60,9 @@ exports.getTour = async (req, res) => {
     });
   } catch (error) {
     res.status(404).json({
-      message: "Error",
+      status: "Fail",
+
+      message: error,
     });
   }
 };
@@ -83,6 +84,7 @@ exports.updateTour = async (req, res) => {
   } catch (error) {
     res.status(404).json({
       status: "fail",
+
       message: error,
     });
   }
