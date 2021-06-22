@@ -29,7 +29,7 @@ class APIfeatures {
         this.query = this.query.sort(sortBy);
       } else {
         // http://localhost:3000/api/v1/tours
-        query = query.sort("-createdAt");
+        this.query = this.query.sort("-createdAt");
       }
       return this;
     }
