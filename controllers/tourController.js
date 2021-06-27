@@ -1,6 +1,7 @@
 const Tour = require("./../models/tourModel");
 const APIfeatures = require("../utils/APIfeatures");
 const catchAsync = require("../utils/catchAsync");
+const AppError = require("../utils/appError");
 
 exports.aliasTours = async (req, res, next) => {
   req.query.limit = "5";
@@ -118,8 +119,17 @@ exports.createTour = catchAsync(async (req, res, next) => {
 
 // route to get single tour based on ID(params)
 exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
+  console.log(req.params.id);
+  if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+    
+    const tourData = await Tour.findById(req.params.id);
+    if (!tourData) {
+      return next(new AppError('No tour found with that ID', 404));
+    }
+  }
   // Tour.findOne({_id:req.params.id});
+
+
   res.status(200).json({
     status: "success",
     data: {
