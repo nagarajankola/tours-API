@@ -119,14 +119,14 @@ exports.createTour = catchAsync(async (req, res, next) => {
 
 // route to get single tour based on ID(params)
 exports.getTour = catchAsync(async (req, res, next) => {
-  console.log(req.params.id);
-  if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
+  // console.log(req.params.id);
+  // // if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
     
-    const tourData = await Tour.findById(req.params.id);
-    if (!tourData) {
+    const tour = await Tour.findById(req.params.id);
+    if (!tour) {
       return next(new AppError('No tour found with that ID', 404));
     }
-  }
+  // }
   // Tour.findOne({_id:req.params.id});
 
 
@@ -153,7 +153,10 @@ exports.updateTour = catchAsync(async (req, res, next) => {
     new: true,
     runValidators: true,
   });
-  console.log(tour);
+  if (!tour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
+  // console.log(tour);
   res.status(200).json({
     status: "success",
     data: {
@@ -173,6 +176,10 @@ exports.updateTour = catchAsync(async (req, res, next) => {
 // route to  deleting a tour
 exports.deleteTour = catchAsync(async (req, res, next) => {
   const deleteTour = await Tour.findByIdAndDelete(req.params.id);
+
+  if (!deleteTour) {
+    return next(new AppError('No tour found with that ID', 404));
+  }
 
   res.status(204).json({
     status: "success",
