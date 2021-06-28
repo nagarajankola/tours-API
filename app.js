@@ -9,11 +9,15 @@ const userRouter = require('./routes/userRoutes');
 const app = express();
 
 // MIDDLEWARES
+// this package gives a pretty representation of the requests made to the routes
+// only useful in development
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
 app.use(express.json());
 
+// this is for frontend
 app.use(express.static(`${__dirname}/public`));
 
 // app.use((req, res, next) => {
@@ -21,6 +25,7 @@ app.use(express.static(`${__dirname}/public`));
 //   next();
 // });
 
+// Redirecting routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 
@@ -39,6 +44,7 @@ app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server`, 404));
 })
 
+// Error handling (yeah kinda advanced)
 app.use(globalErrorHandler);
 
 module.exports = app;

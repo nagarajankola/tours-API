@@ -1,10 +1,12 @@
 const AppError = require("../utils/appError");
 
+// invalid ...
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
   return new AppError(message, 400);
 };
 
+// while validation, eg: primary key
 const errDuplicateFieldsDB = (err) => {
   const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
   const message = `Duplicate field value ${value}. Please use another value!`;
@@ -12,6 +14,7 @@ const errDuplicateFieldsDB = (err) => {
   return new AppError(message, 400);
 };
 
+// not really sure
 const handleValidationErrorDB = (error) => {
   const errors = Object.values(err.errors).map((el) => el.message);
 
@@ -19,6 +22,7 @@ const handleValidationErrorDB = (error) => {
   return new AppError(message, 400);
 };
 
+// in development the error is logged with all the details so as to solve them
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -28,6 +32,7 @@ const sendErrorDev = (err, res) => {
   });
 };
 
+// in production there is no need to send all the eror details so only send the relevant ones
 const sendErrorProd = (err, res) => {
   // error is of operational so we can send the message and response
   if (err.isOperational) {
@@ -48,6 +53,7 @@ const sendErrorProd = (err, res) => {
   }
 };
 
+// controllers main logic for error handling
 module.exports = (err, req, res, next) => {
   console.log(err.stack);
 

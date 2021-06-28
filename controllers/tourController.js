@@ -3,6 +3,7 @@ const APIfeatures = require("../utils/APIfeatures");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 
+// Middleware for filtering top 5 tours
 exports.aliasTours = async (req, res, next) => {
   req.query.limit = "5";
   req.query.sort = "-ratingsAverage,price";
