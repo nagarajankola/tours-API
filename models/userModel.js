@@ -61,7 +61,7 @@ userSchema.methods.correctPassword = async function (
 
 // To check if the user jas changed the password after issuing the token
 // JWTTimestamp gives the time when the token was created and issued
-userSchema.methods.changedPassword = function(JWTTimestamp){
+userSchema.methods.changedPasswordAfter = function(JWTTimestamp){
   if(this.passwordChangedAt){
     // As password changed at is from mongoDB we are changing the timestamp to miliseconds version(coz JWT time will be in miliseconds)
     const changedTimestamp = parseInt(this.passwordChangedAt.getTime()/1000,10);
