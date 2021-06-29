@@ -25,6 +25,7 @@ app.use(express.static(`${__dirname}/public`));
 //   next();
 // });
 
+// RULE: FAT MODELS AND THIN CONTROLLERS
 // Redirecting routes
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
