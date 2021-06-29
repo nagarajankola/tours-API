@@ -22,6 +22,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    role: req.body.role,
   });
 
   const token = signToken(newUser._id);
@@ -92,10 +93,26 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // 4) Check if user changed password after the token was issued
   if (currentUser.changedPasswordAfter(decoded.iat)) {
-    return next(new AppError("User changed password. Please login again.", 401));
+    return next(
+      new AppError("User changed password. Please login again.", 401)
+    );
   }
 
   // 5) Grant access to protected route
   req.user = currentUser;
   next();
 });
+
+// Middleware to check if the logged guy is either admin or lead-guide
+// ...roles gets the value from tourRoute for which the route is permitted
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // role['admin','lead-guide']
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You do not have permission to perform this action", 403)
+      );
+    }
+    next();
+  };
+};

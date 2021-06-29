@@ -1,0 +1,14 @@
+1) create an environment
+
+2) in signup where u create an jwt Token
+    there in test section, add this 
+    pm.environment.set('jwt', pm.response.json().token);
+
+    // This will set the value of jwt as the generated token
+
+3) Do the same in login alsoo
+
+4) And for whichever the routes you put Middleware
+    go to that route > authorization section > set Token as           {{jwt}}
+
+

@@ -15,6 +15,11 @@ const userSchema = new mongoose.Schema({
     validate: [validator.isEmail, "Please provide valid email"],
   },
   photo: String,
+  role: {
+    type: String,
+    enum: ['admin', 'user', 'guide', 'lead-guide'],
+    default: 'user',
+  },
   password: {
     type: String,
     required: [true, "Password is required"],
@@ -34,7 +39,7 @@ const userSchema = new mongoose.Schema({
     },
   },
   // this gets changed everytime the user changes the password
-  passwordChangedAt: Date
+  passwordChangedAt: Date,
 });
 
 userSchema.pre("save", async function (next) {
@@ -61,15 +66,18 @@ userSchema.methods.correctPassword = async function (
 
 // To check if the user jas changed the password after issuing the token
 // JWTTimestamp gives the time when the token was created and issued
-userSchema.methods.changedPasswordAfter = function(JWTTimestamp){
-  if(this.passwordChangedAt){
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
     // As password changed at is from mongoDB we are changing the timestamp to miliseconds version(coz JWT time will be in miliseconds)
-    const changedTimestamp = parseInt(this.passwordChangedAt.getTime()/1000,10);
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
     // console.log(changedTimestamp,  JWTTimestamp)
-    return JWTTimestamp<changedTimestamp;
+    return JWTTimestamp < changedTimestamp;
   }
   return false;
-}
+};
 
 const User = mongoose.model("User", userSchema);
 
