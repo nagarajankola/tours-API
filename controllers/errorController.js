@@ -40,7 +40,7 @@ const sendErrorProd = (err, res) => {
       status: err.status,
       message: err.message,
     });
-    // this is for internal error that we dont want to lead to client
+    // this is for internal error that we dont want to lead to client or we dont wanna leak the error
   } else {
     // 1) log the error
     console.error("Error: " + err);
@@ -52,6 +52,14 @@ const sendErrorProd = (err, res) => {
     });
   }
 };
+
+// If there is any error in the token or if the token is invalid
+const handleJWTError = () =>
+  new AppError("Invalid token. Please login again.", 401);
+
+// When the token is expired
+const handleJWTExpiredError = () =>
+  new AppError("Your token has expired. Please login again.", 401);
 
 // controllers main logic for error handling
 module.exports = (err, req, res, next) => {
@@ -67,6 +75,8 @@ module.exports = (err, req, res, next) => {
     if (error.name === "CastError") error = handleCastErrorDB(error);
     if (err.code === 11000) error = errDuplicateFieldsDB(error);
     if (err.name === "ValidationError") error = handleValidationErrorDB(error);
+    if (err.name === "JsonWebTokenError") error = handleJWTError(error);
+    if (err.name === "TokenExpiredError") error = handleJWTExpiredError(error);
 
     sendErrorProd(error, res);
   }

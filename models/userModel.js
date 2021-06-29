@@ -33,6 +33,8 @@ const userSchema = new mongoose.Schema({
       message: "Passwords dosen't match",
     },
   },
+  // this gets changed everytime the user changes the password
+  passwordChangedAt: Date
 });
 
 userSchema.pre("save", async function (next) {
@@ -56,6 +58,18 @@ userSchema.methods.correctPassword = async function (
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
 };
+
+// To check if the user jas changed the password after issuing the token
+// JWTTimestamp gives the time when the token was created and issued
+userSchema.methods.changedPassword = function(JWTTimestamp){
+  if(this.passwordChangedAt){
+    // As password changed at is from mongoDB we are changing the timestamp to miliseconds version(coz JWT time will be in miliseconds)
+    const changedTimestamp = parseInt(this.passwordChangedAt.getTime()/1000,10);
+    // console.log(changedTimestamp,  JWTTimestamp)
+    return JWTTimestamp<changedTimestamp;
+  }
+  return false;
+}
 
 const User = mongoose.model("User", userSchema);
 

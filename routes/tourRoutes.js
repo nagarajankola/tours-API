@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const tourController = require('../controllers/tourController');
+const authController = require('../controllers/authController');
 
 // ROUTES
 // app.get('/api/v1/tours', getAllTours);
@@ -18,7 +19,8 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
 router
   .route('/')
-  .get(tourController.getAllTours)
+  // protected route, while loggingIn we always have to send the token
+  .get(authController.protect, tourController.getAllTours)
   .post( tourController.createTour);
 
 router
