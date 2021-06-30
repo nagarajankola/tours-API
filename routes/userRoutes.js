@@ -15,6 +15,9 @@ router.patch(
   authController.updatePassword
 );
 
+// route to update the personal info of the user by user 
+router.patch("/updateMe", authController.protect, userController.updateMe)
+
 router
   .route("/")
   .get(userController.getAllUsers)
