@@ -19,7 +19,22 @@ const signToken = (id) => {
 };
 
 const createSendToken = (user, statusCode, res) => {
-  const token = signToken(user._id)
+  const token = signToken(user._id);
+
+  // sending jwt token as a cookie so that the next time the app makes the call it will always send the jwt token
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    httpOnly: true,
+  };
+
+  if (process.env.NODE_ENV === "production") cookieOptions.secure = true;
+
+  res.cookie("jwt", token, cookieOptions);
+
+  // to remove password 
+  user.password = undefined;
 
   res.status(statusCode).json({
     status: "success",
@@ -28,7 +43,7 @@ const createSendToken = (user, statusCode, res) => {
       user: user,
     },
   });
-}
+};
 
 exports.signup = catchAsync(async (req, res, next) => {
   const newUser = await User.create({
@@ -40,7 +55,6 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   createSendToken(newUser, 201, res);
-
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -64,7 +78,6 @@ exports.login = catchAsync(async (req, res, next) => {
 
   // 3)If everythings fine send back the jwt token
   createSendToken(user, 200, res);
-
 });
 
 // Middleware to cross verify JWT token
@@ -122,7 +135,7 @@ exports.restrictTo = (...roles) => {
 };
 
 // After clicking on forgotPassword you will receive mail with reset token
-// there in the body specify new password 
+// there in the body specify new password
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) Get user based on Posted email
   const user = await User.findOne({ email: req.body.email });
@@ -191,16 +204,15 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 4) Log the user in send JWT
   createSendToken(user, 200, res);
-
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
   // 1) Get user from collection
-  const user = await User.findById(req.user.id).select('+password');
+  const user = await User.findById(req.user.id).select("+password");
 
   // 2) Check if posted curremt password is correct
-  if(!(await user.correctPassword(req.body.passwordCurrent, user.password))){
-    return next(new AppError('Your curremt password is incorrect', 401));
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("Your curremt password is incorrect", 401));
   }
 
   // 3) If yes then update password
@@ -211,5 +223,4 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
 
   // 4) Log the user in and send JWT
   createSendToken(user, 200, res);
-
-})
+});
