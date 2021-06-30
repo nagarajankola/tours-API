@@ -17,6 +17,8 @@ router.patch(
 
 // route to update the personal info of the user by user 
 router.patch("/updateMe", authController.protect, userController.updateMe)
+// basically making them inactive
+router.delete("/deleteMe", authController.protect, userController.deleteMe)
 
 router
   .route("/")

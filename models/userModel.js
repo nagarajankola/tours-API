@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema({
   passwordChangedAt: Date,
   passwordResetToken: String,
   passwordResetExpires: Date,
+  isActive: {
+    type: Boolean,
+    default: true,
+    select: false,
+  }
 });
 
 userSchema.pre("save", async function (next) {
@@ -64,6 +69,14 @@ userSchema.pre("save", function (next) {
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
+
+// so for all the find methods only the users which are active are used
+// so now updating logging in wont work
+userSchema.pre(/^find/, function(next){
+  this.find({isActive: {$ne: false}});
+  next();
+})
+
 
 // This is just a method to check if the password is correct while logging in the user
 // Actual functionallity is in authController, here its just the  method
