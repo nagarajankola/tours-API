@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+// const User = require("./userModel");
 const slugify = require("slugify");
 // const { default: validator } = require("validator");
 const validate = require("validator");
@@ -51,13 +52,13 @@ const tourSchema = new mongoose.Schema(
     },
     priceDiscount: {
       type: Number,
-      validate:{
-        validator:function(value) {
+      validate: {
+        validator: function (value) {
           // This only ppoints while creating NEW doc and not updating
-          return value<this.price;
+          return value < this.price;
         },
-        message: "Discount price {{VALUE}} must be less than  regular price"
-      } 
+        message: "Discount price {{VALUE}} must be less than  regular price",
+      },
     },
     summary: {
       type: String,
@@ -83,6 +84,35 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    startLocation: {
+      // GeoJSON
+      type: {
+        type: String,
+        default: "Point",
+        enum: ["Point"],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: "Point",
+          enum: ["Point"],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    // guides: Array,
+    guides: [
+      {type: mongoose.Schema.ObjectId,
+      ref: 'User'}
+    ]
   },
   {
     toJSON: { virtuals: true },
@@ -99,6 +129,15 @@ tourSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
+
+// VERY IMPORTANTTTTTTTTT
+// This middleware takes the d of the user in the req.body but before saving it to the database it loops through the ids and takes all their info and saves the complete imfo of the user in the database
+// In the schema just put <guides: Array>. and no need to make any more changes there as to save a doc
+// tourSchema.pre("save",async function (next) {
+//   const guidesPromises = this.guides.map((id) => User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
 
 // tourSchema.pre('save', function(next){
 //   console.log("check")
