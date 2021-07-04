@@ -122,14 +122,18 @@ exports.createTour = catchAsync(async (req, res, next) => {
 exports.getTour = catchAsync(async (req, res, next) => {
   // console.log(req.params.id);
   // // if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
-    
-    const tour = await Tour.findById(req.params.id);
-    if (!tour) {
-      return next(new AppError('No tour found with that ID', 404));
-    }
+
+  // we can also use the populate query here 
+  const tour = await Tour.findById(req.params.id)
+  // .populate({
+  //   path: "guides",
+  //   select: "-__v -passwordChangedAt",
+  // });
+  if (!tour) {
+    return next(new AppError("No tour found with that ID", 404));
+  }
   // }
   // Tour.findOne({_id:req.params.id});
-
 
   res.status(200).json({
     status: "success",
@@ -155,7 +159,7 @@ exports.updateTour = catchAsync(async (req, res, next) => {
     runValidators: true,
   });
   if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
+    return next(new AppError("No tour found with that ID", 404));
   }
   // console.log(tour);
   res.status(200).json({
@@ -179,7 +183,7 @@ exports.deleteTour = catchAsync(async (req, res, next) => {
   const deleteTour = await Tour.findByIdAndDelete(req.params.id);
 
   if (!deleteTour) {
-    return next(new AppError('No tour found with that ID', 404));
+    return next(new AppError("No tour found with that ID", 404));
   }
 
   res.status(204).json({

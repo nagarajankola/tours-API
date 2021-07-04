@@ -109,10 +109,7 @@ const tourSchema = new mongoose.Schema(
       },
     ],
     // guides: Array,
-    guides: [
-      {type: mongoose.Schema.ObjectId,
-      ref: 'User'}
-    ]
+    guides: [{ type: mongoose.Schema.ObjectId, ref: "User" }],
   },
   {
     toJSON: { virtuals: true },
@@ -154,6 +151,15 @@ tourSchema.pre(/^find/, function (next) {
   this.find({ secretTour: { $ne: true } });
 
   this.start = Date.now();
+  next();
+});
+
+// [POPULATE] Using middleware to convert IDs into actual document while getting the data. As all the methods to get the data starts from find this works everytime
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "guides",
+    select: "-__v -passwordChangedAt",
+  });
   next();
 });
 
