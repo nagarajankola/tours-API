@@ -10,6 +10,8 @@ const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
 const tourRouter = require("./routes/tourRoutes");
 const userRouter = require("./routes/userRoutes");
+const reviewRouter = require("./routes/reviewRoutes");
+const APIfeatures = require("./utils/APIfeatures");
 
 const app = express();
 
@@ -79,6 +81,7 @@ app.use((req, res, next) => {
 // Redirecting routes
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/reviews", reviewRouter);
 
 // Error handling
 // After searching all the routes the control will reach here and send them the response. Order we metion matters!!!!!
