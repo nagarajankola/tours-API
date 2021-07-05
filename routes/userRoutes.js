@@ -9,17 +9,19 @@ router.post("/login", authController.login);
 router.post("/forgotPassword", authController.forgotPassword);
 router.patch("/resetPassword/:token", authController.resetPassword);
 
-router.patch(
-  "/updateMyPassword",
-  authController.protect,
-  authController.updatePassword
-);
+// This will protect all the routes which comes after this line
+router.use(authController.protect);
 
-router.get("/me", authController.protect, userController.getMe, userController.getUser);
+router.patch("/updateMyPassword", authController.updatePassword);
+
+router.get("/me", userController.getMe, userController.getUser);
 // route to update the personal info of the user by user
-router.patch("/updateMe", authController.protect, userController.updateMe);
+router.patch("/updateMe", userController.updateMe);
 // basically making them inactive
-router.delete("/deleteMe", authController.protect, userController.deleteMe);
+router.delete("/deleteMe", userController.deleteMe);
+
+// Only admin can access the routes which comes after this line
+router.use(authController.restrictTo('admin'))
 
 router
   .route("/")
