@@ -15,6 +15,7 @@ router.patch(
   authController.updatePassword
 );
 
+router.get("/me", authController.protect, userController.getMe, userController.getUser);
 // route to update the personal info of the user by user
 router.patch("/updateMe", authController.protect, userController.updateMe);
 // basically making them inactive
