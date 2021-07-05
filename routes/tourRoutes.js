@@ -1,7 +1,10 @@
 const express = require("express");
-const router = express.Router();
 const tourController = require("../controllers/tourController");
 const authController = require("../controllers/authController");
+const reviewRouter = require("../routes/reviewRoutes");
+// const reviewController = require("../controllers/reviewController");
+
+const router = express.Router();
 
 // ROUTES
 // app.get('/api/v1/tours', getAllTours);
@@ -34,5 +37,18 @@ router
     authController.restrictTo("admin", "lead-guide"),
     tourController.deleteTour
   );
+
+// As we know the review belongs to the tour so this route was moved here.
+// but now its moved (routed) back to review route itself below.
+// POST http://localhost:5000/api/v1/tours/tourId/reviews
+// router
+//   .route("/:tourId/reviews")
+//   .post(
+//     authController.protect,
+//     authController.restrictTo("user"),
+//     reviewController.createReview
+//   );
+
+router.use("/:tourId/reviews", reviewRouter);
 
 module.exports = router;

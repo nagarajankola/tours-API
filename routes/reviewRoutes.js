@@ -2,7 +2,8 @@ const express = require("express");
 const reviewController = require("../controllers/reviewController");
 const authController = require("../controllers/authController");
 
-const router = express.Router();
+// the mergeParams gives access to all the variables in the url
+const router = express.Router({ mergeParams: true });
 
 router
   .route("/")
