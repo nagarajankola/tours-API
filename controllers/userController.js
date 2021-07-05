@@ -1,6 +1,7 @@
 const User = require("./../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
+const factory = require("./handleFactory");
 
 // This function gets only the required fields[that is name and email in this case] and just discards the other info
 // ...allowedFields get the value of 'name',''email' specified during the function call
@@ -13,18 +14,19 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.getAllUsers = catchAsync(async (req, res, next) => {
-  const users = await User.find();
-  // getting user info except password
-  // SEND RESPONSE
-  res.status(200).json({
-    status: "success",
-    result: users.length,
-    data: {
-      users,
-    },
-  });
-});
+exports.getAllUsers = factory.getAll(User);
+// exports.getAllUsers = catchAsync(async (req, res, next) => {
+//   const users = await User.find();
+//   // getting user info except password
+//   // SEND RESPONSE
+//   res.status(200).json({
+//     status: "success",
+//     result: users.length,
+//     data: {
+//       users,
+//     },
+//   });
+// });
 
 // to update the user info by user
 exports.updateMe = catchAsync(async (req, res, next) => {
@@ -56,38 +58,35 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteMe = catchAsync(async (req, res, next) => {
-  await User.findByIdAndUpdate(req.user.id, {isActive: false});
+  await User.findByIdAndUpdate(req.user.id, { isActive: false });
 
   res.status(204).json({
     status: "success",
-    data: null
-  })
-})
-
-exports.getUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is yet to define",
+    data: null,
   });
-};
+});
+
+exports.getUser = factory.getOne(User);
 
 exports.createUser = (req, res) => {
   res.status(500).json({
     status: "error",
-    message: "This route is yet to define",
+    message: "This route is not to define. Please use /signup instead.",
   });
 };
 
-exports.updateUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is yet to define",
-  });
-};
+// exports.updateUser = (req, res) => {
+//   res.status(500).json({
+//     status: "error",
+//     message: "This route is yet to define",
+//   });
+// };
+exports.updateUser = factory.updateOne(User);
 
-exports.deleteUser = (req, res) => {
-  res.status(500).json({
-    status: "error",
-    message: "This route is yet to define",
-  });
-};
+// exports.deleteUser = (req, res) => {
+//   res.status(500).json({
+//     status: "error",
+//     message: "This route is yet to define",
+//   });
+// };
+exports.deleteUser = factory.deleteOne(User);
