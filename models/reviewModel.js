@@ -35,10 +35,16 @@ const reviewSchema = new mongoose.Schema(
 
 // Populating tour and user at the same time by only specifying req fields
 reviewSchema.pre(/^find/, function (next) {
+  // this.populate({
+  //   path: "tour",
+  //   select: "name",
+  // }).populate({
+  //   path: "user",
+  //   select: "name photo",
+  // });
+
+  // Populatig only user coz while accessing the tour details there is no need ti get the details of the tour again inside review
   this.populate({
-    path: "tour",
-    select: "name",
-  }).populate({
     path: "user",
     select: "name photo",
   });

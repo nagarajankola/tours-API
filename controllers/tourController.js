@@ -123,8 +123,9 @@ exports.getTour = catchAsync(async (req, res, next) => {
   // console.log(req.params.id);
   // // if (req.params.id.match(/^[0-9a-fA-F]{24}$/)) {
 
-  // we can also use the populate query here 
-  const tour = await Tour.findById(req.params.id)
+  // we can also use the populate query here
+  // Put populate while populating reviews
+  const tour = await Tour.findById(req.params.id).populate("reviews");
   // .populate({
   //   path: "guides",
   //   select: "-__v -passwordChangedAt",

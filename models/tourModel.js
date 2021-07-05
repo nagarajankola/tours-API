@@ -121,6 +121,16 @@ tourSchema.virtual("durationWeeks").get(function () {
   return this.duration / 7;
 });
 
+//Virtual populate
+// What is virtual populate?
+// Here in the tour schema there isn't any field named review. but using virtual we can put the new element in schema as review
+// here all the review from ReviewSchema can be embeded while accessing the tour
+tourSchema.virtual("reviews", {
+  ref: "Review",
+  foreignField: "tour",
+  localField: "_id",
+});
+
 // Document middleware, runs before save and create (not for other things)
 tourSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
