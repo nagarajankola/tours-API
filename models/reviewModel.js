@@ -34,6 +34,8 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
+
 // Populating tour and user at the same time by only specifying req fields
 reviewSchema.pre(/^find/, function (next) {
   // this.populate({
@@ -73,14 +75,13 @@ reviewSchema.statics.calcAverageRating = async function (tourId) {
       ratingsQuantity: stats[0].nRatings,
       ratingsAverage: stats[0].avgRating,
     });
-  }else{
+  } else {
     await Tour.findByIdAndUpdate(tourId, {
       ratingsQuantity: 0,
       ratingsAverage: 4.5,
     });
   }
 };
-
 
 // Watch review tutorial once again
 reviewSchema.post("save", function () {
