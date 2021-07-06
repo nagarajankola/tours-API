@@ -28,6 +28,16 @@ router
     tourController.getMonthlyPlan
   );
 
+  // To get the tours within the specified radius
+router
+  .route("/tours-within/:distance/center/:latlng/unit/:unit")
+  .get(tourController.getTourWithin);
+// /tours-within?distance=233&center=-40,50&unit=mi
+// /tours-within?233/center/-40,50/unit/mi
+
+// To get the nearest tours in order
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistance)
+
 router
   .route("/")
   // protected route, while loggingIn we always have to send the token
