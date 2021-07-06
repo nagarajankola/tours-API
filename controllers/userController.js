@@ -1,7 +1,7 @@
 const User = require("./../models/userModel");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const factory = require("./handleFactory");
+const factory = require("./handlerFactory");
 
 // This function gets only the required fields[that is name and email in this case] and just discards the other info
 // ...allowedFields get the value of 'name',''email' specified during the function call

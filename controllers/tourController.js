@@ -2,7 +2,7 @@ const Tour = require("./../models/tourModel");
 // const APIfeatures = require("../utils/APIfeatures");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
-const factory = require("./handleFactory");
+const factory = require("./handlerFactory");
 
 // Middleware for filtering top 5 tours
 exports.aliasTours = async (req, res, next) => {
