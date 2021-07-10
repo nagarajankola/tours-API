@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 // order this is placed matters coz it will be effected to every line written after this
 process.on("uncaughtException", (err) => {
   console.log("Unhandled exception, shutting down!");
+  console.log("complete error: " + err);
   console.log(err.name, err.message);
   process.exit(1);
 });

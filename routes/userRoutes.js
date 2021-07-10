@@ -14,14 +14,19 @@ router.use(authController.protect);
 
 router.patch("/updateMyPassword", authController.updatePassword);
 
-router.get("/me", userController.getMe, userController.getUser);
+router.get(
+  "/me",
+  authController.protect,
+  userController.getMe,
+  userController.getUser
+);
 // route to update the personal info of the user by user
 router.patch("/updateMe", userController.updateMe);
 // basically making them inactive
 router.delete("/deleteMe", userController.deleteMe);
 
 // Only admin can access the routes which comes after this line
-router.use(authController.restrictTo('admin'))
+router.use(authController.restrictTo("admin"));
 
 router
   .route("/")

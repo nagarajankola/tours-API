@@ -47,14 +47,14 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
     select: false,
-  }
+  },
 });
 
 userSchema.pre("save", async function (next) {
   // Only run the function if password was actually modified, that means when the user updates the email or other details using save method no need to run this function
   if (!this.isModified("password")) return next();
 
-  // Hash the password with cost of 12
+  // Hash the password with cost of 12(cpu intensive)
   this.password = await bcrypt.hash(this.password, 12);
 
   // Delete the passwordConfirm field
@@ -64,6 +64,7 @@ userSchema.pre("save", async function (next) {
 
 // After resetting password through token link and stuff we have to change the passwordChangedAt
 userSchema.pre("save", function (next) {
+  // only run this password hashing when the only password is changed or modified and not when other things in the schema is modified
   if (!this.isModified("password") || this.isNew) return next();
 
   this.passwordChangedAt = Date.now() - 1000;
@@ -72,11 +73,10 @@ userSchema.pre("save", function (next) {
 
 // so for all the find methods only the users which are active are used
 // so now updating logging in wont work
-userSchema.pre(/^find/, function(next){
-  this.find({isActive: {$ne: false}});
+userSchema.pre(/^find/, function (next) {
+  this.find({ isActive: { $ne: false } });
   next();
-})
-
+});
 
 // This is just a method to check if the password is correct while logging in the user
 // Actual functionallity is in authController, here its just the  method
@@ -85,6 +85,8 @@ userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
 ) {
+  // candidate password = password which we got from the user
+  // user password = actual password in  the db
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
@@ -98,17 +100,19 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
       10
     );
     // console.log(changedTimestamp,  JWTTimestamp)
+    // password will be saved first and later the jwt token will be issued
+    // so in that sense JWT<changedTimeStamp means pass was not changed
     return JWTTimestamp < changedTimestamp;
   }
+  // false means not changed
   return false;
 };
-
 
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
 
   this.passwordResetToken = crypto
-    .createHash("sha512")
+    .createHash("sha256")
     .update(resetToken)
     .digest("hex");
 

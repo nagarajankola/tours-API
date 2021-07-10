@@ -24,8 +24,10 @@ const createSendToken = (user, statusCode, res) => {
   // sending jwt token as a cookie so that the next time the app makes the call it will always send the jwt token
   const cookieOptions = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000 // 90days*24hours*60min*60sec*1000milsec*
     ),
+    // // in this two ways, browser wont be able to access the cookie
+    // secure: true,
     httpOnly: true,
   };
 
@@ -33,7 +35,7 @@ const createSendToken = (user, statusCode, res) => {
 
   res.cookie("jwt", token, cookieOptions);
 
-  // to remove password 
+  // to remove password from the output
   user.password = undefined;
 
   res.status(statusCode).json({
@@ -51,7 +53,6 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
-    role: req.body.role,
   });
 
   createSendToken(newUser, 201, res);
@@ -70,9 +71,9 @@ exports.login = catchAsync(async (req, res, next) => {
     email: email,
   }).select("+password");
   //   here we are accessing the encrypted pass from db to check w the user entered pass
-  const correct = await user.correctPassword(password, user.password);
 
-  if (!user || !correct) {
+  // put the password matching logic inside the if condition so that is teh user exist only  then the condition will run
+  if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError("Incorrect email or password", 401));
   }
 
@@ -191,7 +192,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 2) If token has not expired and there is user, set the new password
   if (!user) {
-    return next(new AppError("Token is invalid or has expired", 404));
+    return next(new AppError("Token is invalid or has expired", 400));
   }
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
@@ -201,7 +202,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   await user.save();
 
   // 3) Update changedPasswordAt property for the user
-
+  // step 3 is in userModel
   // 4) Log the user in send JWT
   createSendToken(user, 200, res);
 });
@@ -219,6 +220,7 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   user.password = req.body.password;
   user.passwordConfirm = req.body.passwordConfirm;
   // we are not using user.update() method coz the validation wont work(check schema) and also the jwt token thing works only on save
+  // we didnt use findByIdAndUpdate method as the middleware we created to encrypt pass wont work
   await user.save();
 
   // 4) Log the user in and send JWT

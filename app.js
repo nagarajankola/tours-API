@@ -17,7 +17,7 @@ const app = express();
 
 // GLOBAL-MIDDLEWARES
 
-// Set
+// Secure/Set http headers
 app.use(helmet());
 
 // this package gives a pretty representation of the requests made to the routes
@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === "development") {
 
 // This snippet limits the server to make many requests
 const limiter = rateLimit({
-  max: 100,
+  max: 10000,
   windowMs: 60 * 60 * 1000,
   message: "Too many requests from this IP, please try again in an hour.",
 });
