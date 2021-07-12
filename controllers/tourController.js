@@ -62,6 +62,7 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
   // 2) images [many image]
   // declare a variable
   req.body.images = [];
+  req.body.imagesInBinary = [];
 
   // as there are multiple promises it has to be done in this way
   await Promise.all(
@@ -75,6 +76,8 @@ exports.resizeTourImages = catchAsync(async (req, res, next) => {
         .toFile(`public/img/tours/${filename}`);
 
       req.body.images.push(filename);
+      req.body.imagesInBinary.push(file)
+      // console.log(file);
     })
   );
   next();
