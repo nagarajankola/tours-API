@@ -17,12 +17,17 @@ router.patch("/updateMyPassword", authController.updatePassword);
 
 router.get(
   "/me",
-  authController.protect,
+  // authController.protect,
   userController.getMe,
   userController.getUser
 );
 // route to update the personal info of the user by user
-router.patch("/updateMe", userController.updateMe);
+router.patch(
+  "/updateMe",
+  userController.uploadUserPhoto,
+  userController.resizeUserPhoto,
+  userController.updateMe
+);
 // basically making them inactive
 router.delete("/deleteMe", userController.deleteMe);
 
