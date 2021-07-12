@@ -41,7 +41,7 @@ const upload = multer({
 exports.uploadUserPhoto = upload.single("photo");
 
 // Resizing and cropping the image
-exports.resizeUserPhoto = (req, res, next) => {
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) {
     return next();
   }
@@ -49,14 +49,14 @@ exports.resizeUserPhoto = (req, res, next) => {
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
   // gotta use sharp package to crop
-  sharp(req.file.buffer)
+  await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
     .toFile(`public/img/users/${req.file.filename}`);
 
   next();
-};
+});
 
 // This function gets only the required fields[that is name and email in this case] and just discards the other info
 // ...allowedFields get the value of 'name',''email' specified during the function call

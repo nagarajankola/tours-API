@@ -1,8 +1,84 @@
+const multer = require("multer");
+const sharp = require("sharp");
 const Tour = require("./../models/tourModel");
 // const APIfeatures = require("../utils/APIfeatures");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const factory = require("./handlerFactory");
+
+// THIS MAKE THE FILE INTO BUFFER
+const multerStorage = multer.memoryStorage();
+
+// To check if the file uploaded is image only
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Not an image! Please upload any image", 400), false);
+  }
+};
+
+// Actual multer
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// IMPORTANT FOR MULTER IMAGE
+// if its only a single image AND only one img field in schema
+// -- upload.single('photo')       > req.file
+
+// if its multiple images AND only one img field in schema
+// -- upload.array('photo', 5)     > req.files
+
+// if its multiple images AND single image AND one and multiple img for diff fields in schema
+exports.uploadTourImages = upload.fields([
+  //> req.files
+  { name: "imageCover", maxCount: 1 },
+  { name: "images", maxCount: 3 },
+]);
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  // console.log(req.files);
+
+  // if there are no images thn just skip
+  if (!req.files.imageCover || !req.files.images) {
+    return next();
+  }
+
+  // 1) Process cover image [for cover image]
+  // gotta use sharp package to crop
+  // first make a file name
+  const imageCoverFileName = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+  // cropping the cover image, [0] coz it gives data in array even if its  a singel pic
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${imageCoverFileName}`);
+  req.body.imageCover = imageCoverFileName;
+
+  // 2) images [many image]
+  // declare a variable
+  req.body.images = [];
+
+  // as there are multiple promises it has to be done in this way
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+      await sharp(file.buffer)
+        .resize(2000, 1333)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${filename}`);
+
+      req.body.images.push(filename);
+    })
+  );
+  next();
+});
 
 // Middleware for filtering top 5 tours
 exports.aliasTours = async (req, res, next) => {
@@ -259,7 +335,6 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
 // /tours-within?distance=233&center=-40,50&unit=mi
 // /tours-within?233/center/14.664748866896895, 74.30133194495794/unit/mi
 exports.getTourWithin = catchAsync(async (req, res, next) => {
-  
   const { distance, latlng, unit } = req.params;
   // seperate out the latitude and longitude
   const [lat, lng] = latlng.split(",");

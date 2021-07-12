@@ -75,6 +75,7 @@ const tourSchema = new mongoose.Schema(
       required: [true, "A tour must have a imageCover"],
     },
     images: [String],
+    imagesInBinary: [String],
     createdAt: {
       type: Date,
       default: Date.now(),
