@@ -5,10 +5,13 @@ const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/appError");
 const factory = require("./handlerFactory");
 
+// THIS IS TO SAVE IMAGE IN SERVER (NO BUFFER)
 // const multerStorage = multer.diskStorage({
+// set the destination
 //   destination: (req, file, cb) => {
 //     cb(null, "public/img/users");
 //   },
+// set the filename
 //   filename: (req, file, cb) => {
 //     // user-434rb3i4u2b3-33333131.jpg
 //     const extension = file.mimetype.split("/")[1];
@@ -16,8 +19,10 @@ const factory = require("./handlerFactory");
 //   },
 // });
 
+// THIS MAKE THE FILE INTO BUFFER
 const multerStorage = multer.memoryStorage();
 
+// To check if the file uploaded is image only
 const multerFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image")) {
     cb(null, true);
@@ -26,20 +31,24 @@ const multerFilter = (req, file, cb) => {
   }
 };
 
+// Actual multer
 const upload = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
 });
 
+// To specify that user gonna upload a single photo
 exports.uploadUserPhoto = upload.single("photo");
 
+// Resizing and cropping the image
 exports.resizeUserPhoto = (req, res, next) => {
   if (!req.file) {
     return next();
   }
-  console.log(req.file)
+  console.log(req.file);
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
 
+  // gotta use sharp package to crop
   sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat("jpeg")

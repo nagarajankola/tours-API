@@ -24,6 +24,7 @@ router.get(
 // route to update the personal info of the user by user
 router.patch(
   "/updateMe",
+  // photo
   userController.uploadUserPhoto,
   userController.resizeUserPhoto,
   userController.updateMe
