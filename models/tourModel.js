@@ -132,6 +132,7 @@ tourSchema.virtual("durationWeeks").get(function () {
 // What is virtual populate?
 // Here in the tour schema there isn't any field named review. but using virtual we can put the new element in schema as review
 // here all the review from ReviewSchema can be embeded while accessing the tour
+// Also put .populate('reviews') which getting data from db
 tourSchema.virtual("reviews", {
   ref: "Review",
   foreignField: "tour",
